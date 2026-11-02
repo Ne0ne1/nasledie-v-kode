@@ -29,7 +29,7 @@
   WebGL startup was unstable; the production path always runs the full renderer.
 
 ## Remaining
-- Final regression run and public Vercel production verification.
+- Owner upload and public Vercel production verification.
 
 ## Known issues
 - Vite reports the expected Three.js bundle-size warning (about 642 kB / 178 kB gzip).
