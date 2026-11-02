@@ -5,7 +5,7 @@ import { createLandscape, createTower } from './Tower.js';
 import './styles.css';
 
 const canvas = document.querySelector('#scene');
-const automatedBrowser = navigator.webdriver === true;
+const automatedBrowser = navigator.webdriver === true && !new URLSearchParams(location.search).has('capture');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x07100d);
 scene.fog = new THREE.FogExp2(0x0b1712, 0.018);
@@ -22,7 +22,7 @@ renderer.shadowMap.enabled = !automatedBrowser;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.12;
 
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
@@ -36,7 +36,7 @@ controls.autoRotate = true;
 controls.autoRotateSpeed = 0.27;
 controls.enablePan = false;
 
-scene.add(new THREE.HemisphereLight(0x9ab5a7, 0x11150f, 1.15));
+scene.add(new THREE.HemisphereLight(0x9ab5a7, 0x11150f, 1.32));
 const keyLight = new THREE.DirectionalLight(0xffdfaa, 3.5);
 keyLight.position.set(-13, 24, 15);
 keyLight.castShadow = true;
@@ -91,6 +91,7 @@ const views = {
   front: { position: [0, 11.4, 38], target: [0, 10.8, 0] },
   high: { position: [17, 24, 19], target: [0, 10, 0] },
   detail: { position: [8.5, 15.5, 11], target: [0, 14, 0] },
+  explode: { position: [25, 17, 55], target: [0, 12, 0] },
   hero: { position: [20, 13, 34], target: [0, 10.4, 0] },
 };
 
@@ -173,9 +174,9 @@ function switchMode(mode) {
   document.querySelector('#xray-panel').classList.toggle('visible', mode === 'xray');
   gsap.to('#build-panel', { autoAlpha: mode === 'build' ? 1 : 0, y: mode === 'build' ? 0 : 15, duration: .35 });
   gsap.to('#xray-panel', { autoAlpha: mode === 'xray' ? 1 : 0, y: mode === 'xray' ? 0 : 15, duration: .35 });
-  if (mode === 'explode') setComponentPositions(true, 1.35);
-  if (mode === 'build') showStage(5);
-  if (mode === 'xray') setXray(true, Number(document.querySelector('#opacity').value) / 100);
+  if (mode === 'explode') { setComponentPositions(true, 1.35); moveCamera('explode', 1.5); }
+  if (mode === 'build') { showStage(5); moveCamera('front', 1.2); }
+  if (mode === 'xray') { setXray(true, Number(document.querySelector('#opacity').value) / 100); moveCamera('front', 1.2); }
 }
 
 function enterExperience() {

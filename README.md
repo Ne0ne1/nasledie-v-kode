@@ -27,6 +27,13 @@ pnpm run preview
 pnpm test
 ```
 
+Экспорт переносимой 3D-модели и создание конкурсных PNG-кадров:
+
+```bash
+pnpm run export:model
+pnpm run build && pnpm run render:stills
+```
+
 ## Управление
 
 - Перетаскивание мышью или касание — вращение камеры.
@@ -44,4 +51,5 @@ Vite, JavaScript, Three.js, OrbitControls, GSAP, CSS и Playwright. Геомет
 автоматически снижается при низкой частоте кадров.
 
 Проект подготовлен для Vercel: команда сборки `pnpm run build`, каталог `dist`.
-Историческая оговорка и источники перечислены в [ANNOTATION.md](./ANNOTATION.md).
+Историческая оговорка приведена в [ANNOTATION.md](./ANNOTATION.md), источники —
+в [SOURCES.md](./SOURCES.md), сценарий защиты — в [DEFENSE.md](./DEFENSE.md).

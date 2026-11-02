@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const stonePalette = [0x77756c, 0x686a63, 0x858177, 0x5e625c, 0x928a7d];
+const stonePalette = [0x858177, 0x72746d, 0x969085, 0x696d66, 0xa09687];
 
 function seeded(index) {
   const value = Math.sin(index * 91.173 + 17.31) * 43758.5453;
@@ -119,7 +119,7 @@ export function createTower() {
   const selectables = [];
   const shellMaterials = [];
   const materials = {
-    core: new THREE.MeshStandardMaterial({ color: 0x64665f, roughness: 0.93, metalness: 0.02 }),
+    core: new THREE.MeshStandardMaterial({ color: 0x706f67, roughness: 0.93, metalness: 0.02 }),
     stone: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.96, vertexColors: true }),
     trim: new THREE.MeshStandardMaterial({ color: 0x9a8f7b, roughness: 0.87 }),
     dark: new THREE.MeshStandardMaterial({ color: 0x050807, roughness: 1, side: THREE.DoubleSide }),
@@ -139,7 +139,7 @@ export function createTower() {
     return group;
   };
 
-  const base = makeComponent('base', 'Каменное основание', 'Массивное основание визуально связывает башню со скальным рельефом.', 1, new THREE.Vector3(0, -1.8, 0));
+  const base = makeComponent('base', 'Каменное основание', 'Массивное основание визуально связывает башню со скальным рельефом.', 1, new THREE.Vector3(0, -1.6, 0));
   const plinth = new THREE.Mesh(new THREE.CylinderGeometry(4.3, 5.1, 1.35, 7), materials.core);
   plinth.position.y = 0.3; plinth.scale.z = 0.88; plinth.castShadow = plinth.receiveShadow = true; base.add(plinth);
   for (let i = 0; i < 3; i++) {
@@ -147,17 +147,17 @@ export function createTower() {
     ledge.position.y = .92 + i * .19; ledge.rotation.y = i * .03; ledge.castShadow = true; base.add(ledge);
   }
 
-  const lower = makeComponent('lower', 'Нижний объём', 'Слегка сужающиеся стены образуют устойчивый силуэт и защищённый нижний ярус.', 2, new THREE.Vector3(-7, .8, 2.5));
+  const lower = makeComponent('lower', 'Нижний объём', 'Слегка сужающиеся стены образуют устойчивый силуэт и защищённый нижний ярус.', 2, new THREE.Vector3(-6, 0, 0));
   const lowerCore = new THREE.Mesh(frustumGeometry(6.5, 5.25, 10.4), materials.core);
   lowerCore.position.y = 6.25; lowerCore.castShadow = lowerCore.receiveShadow = true; lower.add(lowerCore);
   lower.add(createStoneCourses({ yStart: 1.2, yEnd: 11.35, widthStart: 6.55, widthEnd: 5.27, name: 'Lower masonry', material: materials.stone }));
 
-  const upper = makeComponent('upper', 'Верхний объём', 'Более узкий верхний ярус завершает вертикальную композицию башни.', 2, new THREE.Vector3(6.5, 2.5, 3.5));
+  const upper = makeComponent('upper', 'Верхний объём', 'Более узкий верхний ярус завершает вертикальную композицию башни.', 2, new THREE.Vector3(6, .8, 0));
   const upperCore = new THREE.Mesh(frustumGeometry(5.25, 4.5, 7.3), materials.core);
   upperCore.position.y = 15.1; upperCore.castShadow = upperCore.receiveShadow = true; upper.add(upperCore);
   upper.add(createStoneCourses({ yStart: 11.45, yEnd: 18.65, widthStart: 5.24, widthEnd: 4.51, name: 'Upper masonry', material: materials.stone, seedOffset: 1000 }));
 
-  const openings = makeComponent('openings', 'Архитектурные проёмы', 'Узкие проёмы и вход создают ритм фасада. Их форма показана в стилизованном виде.', 2, new THREE.Vector3(0, 1, 8));
+  const openings = makeComponent('openings', 'Архитектурные проёмы', 'Узкие проёмы и вход создают ритм фасада. Их форма показана в стилизованном виде.', 2, new THREE.Vector3(0, 0, 5));
   const openingData = [
     { y: 3.5, w: 1.35, h: 2.75, face: 0 }, { y: 8.1, w: .72, h: 1.5, face: 0 }, { y: 13.1, w: .65, h: 1.35, face: 0 }, { y: 16.2, w: .62, h: 1.25, face: 0 },
     { y: 6.1, w: .58, h: 1.25, face: 1 }, { y: 10.2, w: .62, h: 1.3, face: 1 }, { y: 14.6, w: .58, h: 1.18, face: 1 },
@@ -175,7 +175,7 @@ export function createTower() {
     openings.add(opening);
   });
 
-  const floors = makeComponent('floors', 'Внутренние перекрытия', 'Внутренние уровни показаны как условная визуализация для изучения конструкции.', 3, new THREE.Vector3(-4.5, 0, -5));
+  const floors = makeComponent('floors', 'Внутренние перекрытия', 'Внутренние уровни показаны как условная визуализация для изучения конструкции.', 3, new THREE.Vector3(0, 0, -5));
   [4.8, 8.7, 12.6, 16.1].forEach((y, index) => {
     const width = THREE.MathUtils.lerp(5.65, 4.25, y / 19);
     const floor = new THREE.Mesh(new THREE.BoxGeometry(width, .28, width), materials.wood);
@@ -188,7 +188,7 @@ export function createTower() {
   const interiorColumn = new THREE.Mesh(new THREE.CylinderGeometry(.18, .24, 15, 8), materials.wood);
   interiorColumn.position.y = 8.7; floors.add(interiorColumn);
 
-  const crown = makeComponent('crown', 'Верхние выступы', 'Выступающие каменные элементы формируют выразительный венец башни.', 4, new THREE.Vector3(0, 5.5, -4));
+  const crown = makeComponent('crown', 'Верхние выступы', 'Выступающие каменные элементы формируют выразительный венец башни.', 4, new THREE.Vector3(-3.2, 2.5, 0));
   const crownBand = new THREE.Mesh(new THREE.BoxGeometry(4.85, .42, 4.85), materials.trim);
   crownBand.position.y = 18.95; crownBand.castShadow = true; crown.add(crownBand);
   const corbelGeo = new THREE.BoxGeometry(.48, .62, .78);
@@ -205,7 +205,7 @@ export function createTower() {
   }
   corbels.castShadow = true; crown.add(corbels);
 
-  const roof = makeComponent('roof', 'Ступенчатое завершение', 'Ступенчатое пирамидальное завершение усиливает вертикаль силуэта.', 4, new THREE.Vector3(0, 8, 0));
+  const roof = makeComponent('roof', 'Ступенчатое завершение', 'Ступенчатое пирамидальное завершение усиливает вертикаль силуэта.', 4, new THREE.Vector3(3.2, 2.5, 0));
   for (let level = 0; level < 6; level++) {
     const size = 4.7 - level * .7;
     const slab = new THREE.Mesh(new THREE.BoxGeometry(size, .5, size), materials.roof);
@@ -222,6 +222,7 @@ export function createTower() {
     component.traverse((child) => { if (child.isMesh && !child.userData.ignoreRaycast) selectables.push(child); });
   });
 
+  root.scale.set(0.88, 1.08, 0.88);
   return { root, components, selectables, shellMaterials, materials };
 }
 
