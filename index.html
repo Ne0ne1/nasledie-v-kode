@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#07100d" />
+  <meta name="description" content="Наследие в коде — интерактивная 3D-модель традиционной вайнахской башни." />
+  <title>Наследие в коде — интерактивная 3D-башня</title>
+</head>
+<body>
+<div id="app">
+  <canvas id="scene" aria-label="Интерактивная трёхмерная модель вайнахской башни"></canvas>
+  <div class="vignette"></div><div class="grain"></div>
+  <header class="topbar">
+    <a class="brand" href="#home" aria-label="На главный экран"><span class="brand-rune">Н</span><span class="brand-copy"><b>Наследие</b><small>в коде</small></span></a>
+    <div class="project-tag">3D-моделирование <i></i> 2026</div>
+    <button class="menu-button" type="button" aria-expanded="false" aria-controls="museum-menu"><span></span><span></span><span class="sr-only">Открыть меню</span></button>
+  </header>
+  <nav id="museum-menu" class="museum-menu" aria-label="Разделы проекта"><button data-scroll="about">О наследии</button><button data-scroll="controls">Управление</button><button data-scroll="sources">Источники</button></nav>
+  <main id="home">
+    <section class="hero" aria-labelledby="title">
+      <p class="overline"><span>Интерактивный музейный экспонат</span><span>01 / 05</span></p>
+      <h1 id="title"><span>Наследие</span><span>в <em>коде</em></span></h1>
+      <p class="hero-copy">Стилизованная цифровая модель вайнахской башни — архитектуры, в которой камень хранит память поколений.</p>
+      <button id="explore" class="primary-button" type="button"><span>Исследовать башню</span><i>↗</i></button>
+    </section>
+    <aside class="object-card" aria-label="Сведения об объекте"><span class="card-index">Объект 01</span><div class="card-line"></div><dl><div><dt>Тип</dt><dd>Башенная архитектура</dd></div><div><dt>Регион</dt><dd>Северный Кавказ</dd></div><div><dt>Модель</dt><dd>Процедурная 3D</dd></div></dl></aside>
+    <div class="hint"><span class="mouse-icon"><i></i></span><span>Удерживайте и двигайте<br />для обзора</span></div>
+  </main>
+  <section id="workspace" class="workspace" aria-label="Интерактивный режим">
+    <div class="mode-panel">
+      <p class="panel-label">Режим просмотра</p>
+      <button class="mode active" data-mode="explore"><i>01</i><span>Исследование</span></button>
+      <button class="mode" data-mode="explode"><i>02</i><span>Разбор конструкции</span></button>
+      <button class="mode" data-mode="build"><i>03</i><span>Этапы строительства</span></button>
+      <button class="mode" data-mode="xray"><i>04</i><span>Архитектурный рентген</span></button>
+      <div class="view-divider"></div><p class="panel-label">Ракурс</p>
+      <div class="view-row"><button data-view="front" aria-label="Фасад">Ф</button><button data-view="high" aria-label="Верхний ракурс">В</button><button data-view="detail" aria-label="Деталь">Д</button></div>
+    </div>
+    <div id="detail-card" class="detail-card" aria-live="polite"><div class="detail-top"><span class="detail-number">01</span><button class="detail-close" aria-label="Закрыть">×</button></div><p class="detail-type">Архитектурный элемент</p><h2 class="detail-title">Каменная кладка</h2><p class="detail-text">Наружная оболочка собрана из стилизованных каменных рядов, повторяющих сужающийся силуэт башни.</p></div>
+    <div id="build-panel" class="build-panel"><p class="panel-label">Условная последовательность цифровой сборки</p><div class="stage-list"><button data-stage="1"><b>01</b><span>Основание</span></button><button data-stage="2"><b>02</b><span>Стены</span></button><button data-stage="3"><b>03</b><span>Перекрытия</span></button><button data-stage="4"><b>04</b><span>Верхний ярус</span></button><button data-stage="5" class="active"><b>05</b><span>Завершение</span></button></div></div>
+    <div id="xray-panel" class="xray-panel"><label for="opacity">Прозрачность оболочки <output>38%</output></label><input id="opacity" type="range" min="10" max="85" value="38" /><small>Внутренняя структура показана условно</small></div>
+    <button id="revive" class="revive-button" type="button"><span class="revive-ring">✦</span><span><small>Кинематографический режим</small>Оживить архитектуру</span></button>
+    <button id="skip" class="skip-button" type="button">Пропустить анимацию</button>
+  </section>
+  <footer class="scene-footer"><div class="quality"><i></i><span>Качество: <b>авто</b></span></div><div class="location">42.8° N&nbsp;&nbsp; 45.7° E</div><button id="info-open" type="button">О проекте <span>＋</span></button></footer>
+  <section id="info-sheet" class="info-sheet" aria-label="О проекте">
+    <button id="info-close" class="sheet-close" aria-label="Закрыть информацию">×</button>
+    <div id="about" class="sheet-intro"><p class="overline">Цифровая интерпретация</p><h2>Архитектура<br />как живая память</h2><p>«Наследие в коде» приглашает исследовать стилизованную модель традиционной вайнахской башни. Геометрия создана программно в Three.js: от сужающегося каменного объёма до верхних выступов и ступенчатого покрытия.</p></div>
+    <div id="controls" class="sheet-block"><span>Управление</span><ul><li>Мышь / касание — вращение</li><li>Колесо / жест — масштаб</li><li>Клик — выбор элемента</li><li>Клавиша Esc — закрыть панель</li></ul></div>
+    <div id="sources" class="sheet-block"><span>О достоверности</span><p>Это стилизованная архитектурная модель, а не точная научная реконструкция. Этапы показывают последовательность цифровой сборки; внутренняя структура — условная визуализация.</p><p class="source-note">Перечень использованных открытых материалов приведён в ANNOTATION.md.</p></div>
+  </section>
+  <div id="cinematic-title" class="cinematic-title"><small>Республиканский конкурс «Здесь моя Родина»</small><strong>Наследие<br /><i>в коде</i></strong><span>Память, собранная заново</span></div>
+  <div class="loader" aria-live="polite"><div class="loader-symbol"><span>Н</span><i></i></div><p>Создаём цифровое наследие</p><div class="loader-track"><i></i></div><span class="loader-value">0%</span></div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
