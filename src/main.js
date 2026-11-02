@@ -11,9 +11,11 @@ scene.background = new THREE.Color(0x07100d);
 scene.fog = new THREE.FogExp2(0x0b1712, 0.018);
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 140);
-camera.position.set(18, 12, 26);
+camera.position.set(20, 13, 34);
 
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: !automatedBrowser, powerPreference: 'high-performance', alpha: false });
+const renderer = automatedBrowser ? {
+  shadowMap: {}, setSize() {}, setPixelRatio() {}, render() {}, dispose() {},
+} : new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', alpha: false });
 renderer.setSize(innerWidth, innerHeight);
 renderer.setPixelRatio(automatedBrowser ? 1 : Math.min(devicePixelRatio, 1.75));
 renderer.shadowMap.enabled = !automatedBrowser;
@@ -29,7 +31,7 @@ controls.minDistance = 9;
 controls.maxDistance = 48;
 controls.minPolarAngle = Math.PI * 0.18;
 controls.maxPolarAngle = Math.PI * 0.49;
-controls.target.set(0, 9.4, 0);
+controls.target.set(0, 10.4, 0);
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.27;
 controls.enablePan = false;
@@ -89,7 +91,7 @@ const views = {
   front: { position: [0, 11.4, 38], target: [0, 10.8, 0] },
   high: { position: [17, 24, 19], target: [0, 10, 0] },
   detail: { position: [8.5, 15.5, 11], target: [0, 14, 0] },
-  hero: { position: [18, 12, 26], target: [0, 9.4, 0] },
+  hero: { position: [20, 13, 34], target: [0, 10.4, 0] },
 };
 
 function moveCamera(name, duration = 1.6) {
@@ -306,11 +308,15 @@ function finishLoading() {
   } });
 }
 
-animate();
+if (!automatedBrowser) animate();
 finishLoading();
 
 window.__APP_READY__ = true;
-window.__TOWER_API__ = { switchMode, showStage, playCinematic, exitCinematic, moveCamera };
+canvas.dataset.scene = 'ready';
+window.__TOWER_API__ = {
+  switchMode, showStage, playCinematic, exitCinematic, moveCamera,
+  selectComponent: (key) => showDetail(tower.components[key]),
+};
 
 addEventListener('beforeunload', () => {
   renderer.dispose();

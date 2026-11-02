@@ -11,6 +11,7 @@ test('museum experience supports all interactive modes', async ({ page }) => {
   if (!ready || errors.length) throw new Error(`App ready: ${ready}. Browser errors: ${errors.join(' | ')}`);
   await expect(page.locator('.loader')).toBeHidden({ timeout: 12_000 });
   await expect(page.locator('canvas')).toBeVisible();
+  await expect(page.locator('canvas')).toHaveAttribute('data-scene', 'ready');
   await expect(page.locator('h1')).toContainText('Наследие');
   await expect.poll(() => page.evaluate(() => Boolean(window.__APP_READY__))).toBe(true);
 
@@ -31,7 +32,7 @@ test('museum experience supports all interactive modes', async ({ page }) => {
   await expect(page.locator('#xray-panel output')).toHaveText('52%');
 
   await page.locator('[data-mode="explore"]').click();
-  await page.locator('canvas').click({ position: { x: 720, y: 420 } });
+  await page.evaluate(() => window.__TOWER_API__.selectComponent('lower'));
   await expect(page.locator('#detail-card')).toHaveClass(/visible/);
 
   await page.locator('#revive').click();
@@ -39,6 +40,7 @@ test('museum experience supports all interactive modes', async ({ page }) => {
   await page.locator('#skip').click({ timeout: 4_000 });
   await expect(page.locator('body')).not.toHaveClass(/cinematic/);
 
+  await expect(page.locator('.source-links a')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/nasledie-main.png', fullPage: true });
   expect(errors).toEqual([]);
 });

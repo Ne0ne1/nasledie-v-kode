@@ -7,7 +7,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4187',
     channel: 'chromium',
-    headless: false,
+    headless: true,
     viewport: { width: 1440, height: 900 },
     screenshot: 'only-on-failure',
   },

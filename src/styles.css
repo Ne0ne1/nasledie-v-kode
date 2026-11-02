@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600&family=Unbounded:wght@300;400;500&display=swap');
+.source-links{display:grid;gap:8px;margin-top:15px!important}.source-links a{color:var(--gold);text-decoration:none;font-size:8px;text-transform:uppercase;letter-spacing:.1em}.source-links a:hover{text-decoration:underline}
 
 :root{color-scheme:dark;--ink:#e8e5d9;--muted:#8a928d;--gold:#c6a968;--green:#8ca991;--bg:#07100d;--panel:rgba(7,15,12,.76);--line:rgba(232,229,217,.17);font-family:Manrope,Arial,sans-serif;background:var(--bg);color:var(--ink)}
 *{box-sizing:border-box}html,body,#app{width:100%;height:100%;margin:0;overflow:hidden}body{background:var(--bg)}button,a{font:inherit;color:inherit}button{border:0}button:focus-visible,a:focus-visible,input:focus-visible{outline:1px solid var(--gold);outline-offset:4px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
