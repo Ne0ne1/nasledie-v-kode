@@ -33,3 +33,11 @@
 
 ## Known issues
 - Vite reports the expected Three.js bundle-size warning (about 642 kB / 178 kB gzip).
+
+## Visual polish — 2026-11-03
+- Warm key and cool rim lighting, brighter varied stone, reduced overlay grain.
+- Corrected stone material vertex-color flag; instance colors remain enabled.
+- Reframed hero/front views, increased orbit range for exploded view, lowered mountain silhouettes.
+- Improved typography, control sizing and contrast; smoother existing tweens.
+- Build passed; Playwright modes passed (1/1); before/after WebGL PNGs inspected.
+- No Vercel project binding or Git remote found; no deployment updated.

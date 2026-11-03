@@ -18,3 +18,35 @@ body.exploring .hero,body.exploring .object-card,body.exploring .hint{pointer-ev
 @keyframes grain{0%{transform:translate(0)}25%{transform:translate(3%,-2%)}50%{transform:translate(-2%,3%)}75%{transform:translate(2%,2%)}100%{transform:translate(-3%,-2%)}}@keyframes wheel{0%{transform:translateY(0);opacity:0}30%{opacity:1}100%{transform:translateY(9px);opacity:0}}@keyframes spin{to{transform:rotate(360deg)}}@keyframes loader-rotate{to{transform:rotate(360deg)}}
 @media(max-width:800px){.topbar{height:70px;padding:0 20px}.project-tag{display:none}.topbar{grid-template-columns:1fr 1fr}.menu-button{grid-column:2}.scene-footer{height:52px;padding:0 20px;grid-template-columns:1fr 1fr}.location{display:none}.hero{left:20px;top:40%;width:calc(100% - 40px)}h1{font-size:clamp(44px,13vw,75px)}h1 span:nth-child(2){padding-left:0}.hero-copy,.primary-button{margin-left:0}.object-card{display:none}.hint{left:20px;bottom:72px}.workspace{inset:70px 0 52px}.mode-panel{left:12px;top:auto;bottom:10px;transform:none;width:calc(100% - 24px);padding:9px;display:flex;gap:3px}.mode-panel>.panel-label,.view-divider,.view-row{display:none}.mode{display:block;padding:10px 4px;text-align:center;font-size:7px;border:0}.mode i{display:block;margin-bottom:4px}.mode.active:after{display:none}.detail-card{right:12px;top:15px;transform:translateX(20px);width:245px}.build-panel{bottom:85px;width:calc(100% - 24px);padding:11px}.stage-list{overflow-x:auto}.stage-list button{min-width:85px}.xray-panel{bottom:85px;width:calc(100% - 24px)}.revive-button{right:12px;bottom:89px}.quality{display:none}.scene-footer>button{grid-column:2}.info-sheet{padding:90px 25px 55px}.sheet-block{grid-template-columns:1fr}.cinematic-title strong{font-size:16vw}}
 @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important}}
+
+/* Exhibition polish: readable controls and restrained atmospheric framing. */
+:root{--ink:#f2ede2;--muted:#acb9bb;--gold:#d8bb82;--panel:rgba(15,25,30,.9);--line:rgba(225,231,230,.2);font-family:Arial,Helvetica,sans-serif}
+.vignette{background:linear-gradient(90deg,rgba(7,16,23,.72),rgba(7,16,23,.16) 40%,transparent 65%),linear-gradient(0deg,rgba(7,16,23,.35),transparent 25%,transparent 80%,rgba(7,16,23,.15))}
+.grain{opacity:.012;animation:none}
+.hero{left:6vw;width:min(560px,43vw);top:46%}
+h1{font-family:Georgia,'Times New Roman',serif;font-size:clamp(48px,6.2vw,98px);line-height:1.06;letter-spacing:-.045em;font-weight:400}
+h1 span:nth-child(2){padding-left:3vw}
+.hero-copy{margin:26px 0 26px 3vw;font-size:14px;line-height:1.8;color:#c3cccd;max-width:350px}
+.primary-button{margin-left:3vw;font-size:11px;min-height:48px;min-width:245px;letter-spacing:.12em}
+.overline,.project-tag{font-size:10px;letter-spacing:.16em}
+.mode-panel{width:230px;padding:20px;border-radius:8px}
+.panel-label{font-size:9px;color:var(--muted)}
+.mode{min-height:48px;font-size:10px;line-height:1.5;color:#bac4c6;position:relative}
+.mode.active{background:rgba(216,187,130,.09);color:#fff5df}
+.mode.active:after{position:absolute;right:0;box-shadow:none}
+.view-row button{width:44px;height:40px;font-size:10px;border-radius:3px}
+.detail-card{width:290px;border-radius:8px}
+.detail-text{font-size:13px;line-height:1.75;color:#bec8ca}
+.detail-title{font-family:Georgia,serif;font-size:25px;letter-spacing:-.015em}
+.detail-close,.menu-button,.sheet-close{min-width:44px;min-height:44px}
+.build-panel,.xray-panel,.revive-button{border-radius:6px}
+.xray-panel label,.xray-panel small,.stage-list span{font-size:10px}
+.revive-button{min-height:54px;font-size:10px}
+.revive-button small{font-size:8px}
+.object-card{font-size:10px;width:230px}
+.object-card dt{color:var(--muted)}
+.scene-footer{font-size:10px}
+.sheet-intro>p:last-child{font-size:14px}
+.sheet-block{font-size:12px}
+.source-links a{font-size:10px}
+@media(max-width:800px){.hero{left:24px;top:40%;width:calc(100% - 48px)}h1{font-size:clamp(43px,12vw,70px)}h1 span:nth-child(2){padding-left:0}.hero-copy,.primary-button{margin-left:0}.hero-copy{font-size:12px;max-width:285px}.mode-panel{width:calc(100% - 24px);padding:9px}.mode{font-size:8px;min-height:52px}.revive-button{font-size:9px}.project-tag{display:none}}

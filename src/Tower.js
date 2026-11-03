@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-const stonePalette = [0x858177, 0x72746d, 0x969085, 0x696d66, 0xa09687];
+const stonePalette = [0xb7aa94, 0x999485, 0xc3b49a, 0x8d928c, 0xa89b85];
 
 function seeded(index) {
   const value = Math.sin(index * 91.173 + 17.31) * 43758.5453;
@@ -65,7 +65,7 @@ function createStoneCourses({ yStart, yEnd, widthStart, widthEnd, name, material
         const offset = (block - (blocksPerSide - 1) / 2) * (width / blocksPerSide);
         const stagger = course % 2 ? width / blocksPerSide / 2 : 0;
         const along = THREE.MathUtils.clamp(offset + stagger, -width * 0.44, width * 0.44);
-        const depth = 0.16 + seeded(n + 2) * 0.1;
+        const depth = 0.19 + seeded(n + 2) * 0.13;
         dummy.position.set(0, y + (seeded(n + 3) - 0.5) * 0.035, 0);
         dummy.rotation.set((seeded(n + 4) - 0.5) * 0.03, (seeded(n + 5) - 0.5) * 0.025, (seeded(n + 6) - 0.5) * 0.025);
         if (face === 0) { dummy.position.x = along; dummy.position.z = width / 2 + inset; dummy.scale.set(blockWidth, courseHeight * 0.91, depth); }
@@ -75,7 +75,7 @@ function createStoneCourses({ yStart, yEnd, widthStart, widthEnd, name, material
         dummy.updateMatrix();
         mesh.setMatrixAt(index, dummy.matrix);
         color.setHex(stonePalette[Math.floor(seeded(n + 7) * stonePalette.length)]);
-        color.multiplyScalar(0.82 + seeded(n + 8) * 0.28);
+        color.multiplyScalar(0.88 + seeded(n + 8) * 0.20);
         mesh.setColorAt(index, color);
         index++;
       }
@@ -119,12 +119,12 @@ export function createTower() {
   const selectables = [];
   const shellMaterials = [];
   const materials = {
-    core: new THREE.MeshStandardMaterial({ color: 0x706f67, roughness: 0.93, metalness: 0.02 }),
-    stone: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.96, vertexColors: true }),
-    trim: new THREE.MeshStandardMaterial({ color: 0x9a8f7b, roughness: 0.87 }),
+    core: new THREE.MeshStandardMaterial({ color: 0x625e54, roughness: 1, metalness: 0 }),
+    stone: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.97 }),
+    trim: new THREE.MeshStandardMaterial({ color: 0xb9aa8f, roughness: 0.94 }),
     dark: new THREE.MeshStandardMaterial({ color: 0x050807, roughness: 1, side: THREE.DoubleSide }),
     wood: new THREE.MeshStandardMaterial({ color: 0x3a2d20, roughness: 0.92 }),
-    roof: new THREE.MeshStandardMaterial({ color: 0x565a53, roughness: 0.9 }),
+    roof: new THREE.MeshStandardMaterial({ color: 0x747e80, roughness: 0.96 }),
     glow: new THREE.MeshBasicMaterial({ color: 0xd5b96f, transparent: true, opacity: 0.55 }),
   };
   shellMaterials.push(materials.core, materials.stone, materials.trim, materials.roof);
@@ -237,7 +237,7 @@ export function createLandscape() {
     position.setZ(i, (d < 8 ? noise * .08 : noise * (0.32 + d / 100)) - .38);
   }
   groundGeometry.computeVertexNormals();
-  const ground = new THREE.Mesh(groundGeometry, new THREE.MeshStandardMaterial({ color: 0x1d2922, roughness: 1, metalness: 0 }));
+  const ground = new THREE.Mesh(groundGeometry, new THREE.MeshStandardMaterial({ color: 0x444c43, roughness: 1, metalness: 0 }));
   ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; group.add(ground);
 
   const rockMaterial = new THREE.MeshStandardMaterial({ color: 0x26322b, roughness: 1, flatShading: true });
@@ -254,7 +254,9 @@ export function createLandscape() {
     points.forEach((p) => vertices.push(p.x, p.y, p.z));
     for (let i = 0; i < 48; i++) { const a = i * 2; indices.push(a, a + 1, a + 3, a, a + 3, a + 2); }
     const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3)); geometry.setIndex(indices); geometry.computeVertexNormals();
-    const mountain = new THREE.Mesh(geometry, rockMaterial); mountain.receiveShadow = true; group.add(mountain);
+    const layerMaterial = rockMaterial.clone();
+    layerMaterial.color.setHex([0x42535b, 0x516975, 0x66818d][ring]);
+    const mountain = new THREE.Mesh(geometry, layerMaterial); mountain.scale.y = 0.42; mountain.receiveShadow = true; group.add(mountain);
   }
   return group;
 }

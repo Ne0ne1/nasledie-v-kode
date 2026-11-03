@@ -7,11 +7,11 @@ import './styles.css';
 const canvas = document.querySelector('#scene');
 const automatedBrowser = navigator.webdriver === true && !new URLSearchParams(location.search).has('capture');
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0x07100d);
-scene.fog = new THREE.FogExp2(0x0b1712, 0.018);
+scene.background = new THREE.Color(0x17252d);
+scene.fog = new THREE.FogExp2(0x263943, 0.009);
 
 const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 140);
-camera.position.set(20, 13, 34);
+camera.position.set(27, 15, 43);
 
 const renderer = automatedBrowser ? {
   shadowMap: {}, setSize() {}, setPixelRatio() {}, render() {}, dispose() {},
@@ -28,25 +28,27 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
 controls.minDistance = 9;
-controls.maxDistance = 48;
+controls.maxDistance = 68;
 controls.minPolarAngle = Math.PI * 0.18;
 controls.maxPolarAngle = Math.PI * 0.49;
-controls.target.set(0, 10.4, 0);
+controls.target.set(-6, 12, 0);
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.27;
 controls.enablePan = false;
 
-scene.add(new THREE.HemisphereLight(0x9ab5a7, 0x11150f, 1.32));
-const keyLight = new THREE.DirectionalLight(0xffdfaa, 3.5);
-keyLight.position.set(-13, 24, 15);
+scene.add(new THREE.HemisphereLight(0xb9d4e5, 0x625242, 2.1));
+const keyLight = new THREE.DirectionalLight(0xffd5a0, 4.2);
+keyLight.position.set(-18, 32, 24);
 keyLight.castShadow = true;
 keyLight.shadow.mapSize.set(automatedBrowser ? 512 : 2048, automatedBrowser ? 512 : 2048);
 keyLight.shadow.camera.left = -18; keyLight.shadow.camera.right = 18;
 keyLight.shadow.camera.top = 28; keyLight.shadow.camera.bottom = -8;
 keyLight.shadow.camera.near = 3; keyLight.shadow.camera.far = 70;
-keyLight.shadow.bias = -0.0005;
+keyLight.shadow.bias = -0.00015;
+keyLight.shadow.normalBias = 0.035;
+keyLight.shadow.radius = 3;
 scene.add(keyLight);
-const rimLight = new THREE.DirectionalLight(0x6f9c83, 2.3);
+const rimLight = new THREE.DirectionalLight(0x9fc9ec, 2.8);
 rimLight.position.set(13, 14, -18); scene.add(rimLight);
 const warmLight = new THREE.PointLight(0xd5a45d, 22, 20, 2);
 warmLight.position.set(2, 5, 7); scene.add(warmLight);
@@ -88,18 +90,18 @@ let cinematicTimeline = null;
 let userInteracted = false;
 
 const views = {
-  front: { position: [0, 11.4, 38], target: [0, 10.8, 0] },
+  front: { position: [10, 15, 49], target: [0, 12, 0] },
   high: { position: [17, 24, 19], target: [0, 10, 0] },
   detail: { position: [8.5, 15.5, 11], target: [0, 14, 0] },
   explode: { position: [25, 17, 55], target: [0, 12, 0] },
-  hero: { position: [20, 13, 34], target: [0, 10.4, 0] },
+  hero: { position: [27, 15, 43], target: [-6, 12, 0] },
 };
 
 function moveCamera(name, duration = 1.6) {
   const view = views[name];
   if (!view) return;
-  gsap.to(camera.position, { x: view.position[0], y: view.position[1], z: view.position[2], duration, ease: 'power3.inOut' });
-  gsap.to(controls.target, { x: view.target[0], y: view.target[1], z: view.target[2], duration, ease: 'power3.inOut' });
+  gsap.to(camera.position, { x: view.position[0], y: view.position[1], z: view.position[2], duration, overwrite: 'auto', ease: 'sine.inOut' });
+  gsap.to(controls.target, { x: view.target[0], y: view.target[1], z: view.target[2], duration, overwrite: 'auto', ease: 'sine.inOut' });
 }
 
 function setComponentPositions(exploded, duration = 1.2) {
@@ -125,7 +127,7 @@ function showStage(stage) {
     const visible = component.userData.stage <= stage;
     if (visible) {
       component.visible = true;
-      gsap.fromTo(component.scale, { x: .82, y: .82, z: .82 }, { x: 1, y: 1, z: 1, duration: .65, ease: 'back.out(1.35)' });
+      gsap.fromTo(component.scale, { x: .82, y: .82, z: .82 }, { x: 1, y: 1, z: 1, duration: .65, ease: 'power2.out' });
     } else {
       component.visible = false;
     }
