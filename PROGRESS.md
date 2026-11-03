@@ -22,11 +22,11 @@
 ## Verification
 - `pnpm run build`: passed (Vite 7.3.7).
 - `pnpm exec playwright test --reporter=line`: 1 passed (7.0 s).
-- `pnpm run export:model`: valid glTF 2.0 GLB, 82 meshes, 7 materials.
+- `pnpm run export:model`: valid glTF 2.0 GLB, 212 meshes, 12 materials.
 - `pnpm run render:stills`: four 1600×1000 PNG files created and inspected.
 - Normal browser: full tower, lighting, fog and final camera framing inspected.
-- Automated browsers use a non-rendering scene profile because repeated headless
-  WebGL startup was unstable; the production path always runs the full renderer.
+- Automated checks now run the real WebGL renderer in headed Chromium; the old
+  webdriver rendering stub has been removed.
 
 ## Remaining
 - Owner upload and public Vercel production verification.
@@ -60,3 +60,10 @@
 - Furnishings remain children of the deck, preserving assembly and construction-stage behavior.
 - Interiors explicitly labeled an artistic interpretation.
 - Production build passed; renders and GLB updated (212 meshes, 12 materials).
+
+## Final competition QA — 2026-11-03
+- Six viewport layouts checked; fixed heading, panel, mobile-label and landscape overlaps.
+- Fixed hidden-ancestor picking, x-ray exhibit selection, cinematic reset, home navigation and selection-helper disposal.
+- Reduced-motion preference skips cinematic flight; real WebGL used in all browser tests.
+- Main regression: 11/11 passed. Final cinematic/mobile follow-up: 5/5 passed; 12 unique tests in suite.
+- GitHub destination verified: Ne0ne1/nasledie-v-kode; origin configured.

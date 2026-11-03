@@ -5,7 +5,7 @@ import { createLandscape, createTower } from './Tower.js';
 import './styles.css';
 
 const canvas = document.querySelector('#scene');
-const automatedBrowser = navigator.webdriver === true && !new URLSearchParams(location.search).has('capture');
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x17252d);
 scene.fog = new THREE.FogExp2(0x263943, 0.009);
@@ -13,12 +13,10 @@ scene.fog = new THREE.FogExp2(0x263943, 0.009);
 const camera = new THREE.PerspectiveCamera(38, innerWidth / innerHeight, 0.1, 140);
 camera.position.set(27, 15, 43);
 
-const renderer = automatedBrowser ? {
-  shadowMap: {}, setSize() {}, setPixelRatio() {}, render() {}, dispose() {},
-} : new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', alpha: false });
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance', alpha: false });
 renderer.setSize(innerWidth, innerHeight);
-renderer.setPixelRatio(automatedBrowser ? 1 : Math.min(devicePixelRatio, 1.75));
-renderer.shadowMap.enabled = !automatedBrowser;
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -28,11 +26,11 @@ const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 controls.dampingFactor = 0.055;
 controls.minDistance = 9;
-controls.maxDistance = 68;
+controls.maxDistance = 90;
 controls.minPolarAngle = Math.PI * 0.18;
 controls.maxPolarAngle = Math.PI * 0.49;
 controls.target.set(-6, 12, 0);
-controls.autoRotate = true;
+controls.autoRotate = !reducedMotion;
 controls.autoRotateSpeed = 0.27;
 controls.enablePan = false;
 
@@ -40,7 +38,7 @@ scene.add(new THREE.HemisphereLight(0xb9d4e5, 0x625242, 2.1));
 const keyLight = new THREE.DirectionalLight(0xffd5a0, 4.2);
 keyLight.position.set(-18, 32, 24);
 keyLight.castShadow = true;
-keyLight.shadow.mapSize.set(automatedBrowser ? 512 : 2048, automatedBrowser ? 512 : 2048);
+keyLight.shadow.mapSize.set(2048, 2048);
 keyLight.shadow.camera.left = -18; keyLight.shadow.camera.right = 18;
 keyLight.shadow.camera.top = 28; keyLight.shadow.camera.bottom = -8;
 keyLight.shadow.camera.near = 3; keyLight.shadow.camera.far = 70;
@@ -98,7 +96,12 @@ const views = {
 };
 
 function moveCamera(name, duration = 1.6) {
-  const view = views[name];
+  if (reducedMotion) duration = 0;
+  let view = views[name];
+  if (innerWidth < 600 && view) {
+    const distance = name === 'hero' ? 80 : name === 'explode' ? 62 : name === 'detail' ? 25 : 53;
+    view = { position: [10, 17, distance], target: [0, name === 'hero' ? 3 : 12, 0] };
+  }
   if (!view) return;
   gsap.to(camera.position, { x: view.position[0], y: view.position[1], z: view.position[2], duration, overwrite: 'auto', ease: 'sine.inOut' });
   gsap.to(controls.target, { x: view.target[0], y: view.target[1], z: view.target[2], duration, overwrite: 'auto', ease: 'sine.inOut' });
@@ -107,7 +110,8 @@ function moveCamera(name, duration = 1.6) {
 function setComponentPositions(exploded, duration = 1.2) {
   Object.values(tower.components).forEach((component, index) => {
     const target = exploded ? component.userData.explode : component.userData.home;
-    gsap.to(component.position, { x: target.x, y: target.y, z: target.z, duration, delay: Math.min(index * .025, .3), ease: 'power3.inOut' });
+    gsap.killTweensOf(component.position);
+    gsap.to(component.position, { x: target.x, y: target.y, z: target.z, duration: reducedMotion ? 0 : duration, delay: reducedMotion ? 0 : Math.min(index * .025, .3), ease: 'power3.inOut' });
   });
 }
 
@@ -122,8 +126,10 @@ function setXray(active, opacity = .38) {
 }
 
 function showStage(stage) {
+  closeDetail();
   setComponentPositions(false, .6);
   Object.values(tower.components).forEach((component) => {
+    gsap.killTweensOf(component.scale);
     const visible = component.userData.stage <= stage;
     if (visible) {
       component.visible = true;
@@ -136,7 +142,7 @@ function showStage(stage) {
 }
 
 function resetComponents() {
-  Object.values(tower.components).forEach((component) => { component.visible = true; component.scale.setScalar(1); });
+  Object.values(tower.components).forEach((component) => { gsap.killTweensOf(component.scale); component.visible = true; component.scale.setScalar(1); });
   setXray(false);
   setComponentPositions(false, .9);
 }
@@ -144,7 +150,7 @@ function resetComponents() {
 function showDetail(component) {
   if (!component) return;
   selected = component;
-  if (selectionBox) scene.remove(selectionBox);
+  if (selectionBox) { scene.remove(selectionBox); selectionBox.geometry.dispose(); selectionBox.material.dispose(); }
   selectionBox = new THREE.BoxHelper(component, 0xc6a968);
   selectionBox.material.transparent = true;
   selectionBox.material.opacity = .72;
@@ -153,9 +159,10 @@ function showDetail(component) {
   const entries = [...new Set(tower.selectables.map((mesh) => mesh.userData.component))];
   const index = entries.indexOf(component) + 1;
   document.querySelector('.detail-number').textContent = String(index).padStart(2, '0');
+  document.querySelector('.detail-type').textContent = component.userData.exhibit ? 'Предмет обстановки' : 'Архитектурный элемент';
   document.querySelector('.detail-title').textContent = component.userData.label;
   document.querySelector('.detail-text').textContent = component.userData.description;
-  gsap.to('#detail-card', { autoAlpha: 1, x: 0, duration: .45, ease: 'power2.out' });
+  gsap.to('#detail-card', { autoAlpha: 1, x: 0, duration: .45, overwrite: true, ease: 'power2.out' });
   document.querySelector('#detail-card').classList.add('visible');
 }
 
@@ -163,7 +170,7 @@ function closeDetail() {
   if (selectionBox) { scene.remove(selectionBox); selectionBox.geometry.dispose(); selectionBox.material.dispose(); selectionBox = null; }
   selected = null;
   document.querySelector('#detail-card').classList.remove('visible');
-  gsap.to('#detail-card', { autoAlpha: 0, x: 20, duration: .3 });
+  gsap.to('#detail-card', { autoAlpha: 0, x: 20, duration: .3, overwrite: true });
 }
 
 function switchMode(mode) {
@@ -176,6 +183,7 @@ function switchMode(mode) {
   document.querySelector('#xray-panel').classList.toggle('visible', mode === 'xray');
   gsap.to('#build-panel', { autoAlpha: mode === 'build' ? 1 : 0, y: mode === 'build' ? 0 : 15, duration: .35 });
   gsap.to('#xray-panel', { autoAlpha: mode === 'xray' ? 1 : 0, y: mode === 'xray' ? 0 : 15, duration: .35 });
+  if (mode === 'explore') moveCamera('front', 1.2);
   if (mode === 'explode') { setComponentPositions(true, 1.35); moveCamera('explode', 1.5); }
   if (mode === 'build') { showStage(5); moveCamera('front', 1.2); }
   if (mode === 'xray') { setXray(true, Number(document.querySelector('#opacity').value) / 100); moveCamera('front', 1.2); }
@@ -200,11 +208,13 @@ function exitCinematic(finish = true) {
   gsap.to('#skip,#cinematic-title', { autoAlpha: 0, duration: .3, onComplete: () => { document.querySelector('#cinematic-title').style.visibility = 'hidden'; } });
   controls.enabled = true;
   resetComponents();
-  if (finish) moveCamera('hero', 1.3);
+  tower.root.rotation.set(0, 0, 0);
+  switchMode('explore');
 }
 
 function playCinematic() {
   if (isCinematic) return;
+  if (reducedMotion) { switchMode('explore'); return; }
   isCinematic = true;
   closeDetail();
   resetComponents();
@@ -236,7 +246,12 @@ function pick(event) {
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
   raycaster.setFromCamera(pointer, camera);
-  const hit = raycaster.intersectObjects(tower.selectables, false).find((item) => item.object.visible);
+  tower.root.updateMatrixWorld(true);
+  const hits = raycaster.intersectObjects(tower.selectables, false).filter((item) => {
+    for (let object = item.object; object; object = object.parent) if (!object.visible) return false;
+    return true;
+  });
+  const hit = (currentMode === 'xray' ? hits.find((item) => item.object.userData.component?.userData.exhibit) : null) || hits[0];
   if (hit?.object.userData.component) showDetail(hit.object.userData.component);
 }
 
@@ -244,6 +259,16 @@ canvas.addEventListener('pointerdown', () => { userInteracted = false; });
 canvas.addEventListener('pointermove', (event) => { if (event.buttons) userInteracted = true; });
 canvas.addEventListener('pointerup', (event) => { if (!userInteracted) pick(event); });
 controls.addEventListener('start', () => { controls.autoRotate = false; });
+document.querySelector('.brand').addEventListener('click', (event) => {
+  event.preventDefault();
+  if (isCinematic) exitCinematic();
+  closeDetail(); closeSheet(); resetComponents();
+  document.body.classList.remove('exploring');
+  document.querySelector('#workspace').classList.remove('active');
+  gsap.set('#workspace', { autoAlpha: 0 });
+  gsap.to('.hero,.object-card,.hint', { autoAlpha: 1, x: 0, duration: .4, overwrite: true });
+  moveCamera('hero');
+});
 document.querySelector('#explore').addEventListener('click', enterExperience);
 document.querySelectorAll('.mode').forEach((button) => button.addEventListener('click', () => switchMode(button.dataset.mode)));
 document.querySelectorAll('[data-view]').forEach((button) => button.addEventListener('click', () => moveCamera(button.dataset.view)));
@@ -277,7 +302,7 @@ document.querySelector('#info-close').addEventListener('click', closeSheet);
 const menuButton = document.querySelector('.menu-button');
 menuButton.addEventListener('click', () => { const open = menuButton.getAttribute('aria-expanded') === 'true'; menuButton.setAttribute('aria-expanded', String(!open)); document.querySelector('#museum-menu').classList.toggle('open', !open); });
 document.querySelectorAll('[data-scroll]').forEach((button) => button.addEventListener('click', () => { document.querySelector('#museum-menu').classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); openSheet(button.dataset.scroll); }));
-addEventListener('keydown', (event) => { if (event.key === 'Escape') { closeDetail(); closeSheet(); if (isCinematic) exitCinematic(true); } });
+addEventListener('keydown', (event) => { if (event.key === 'Escape') { document.querySelector('#museum-menu').classList.remove('open'); menuButton.setAttribute('aria-expanded', 'false'); closeDetail(); closeSheet(); if (isCinematic) exitCinematic(true); } });
 
 let frameCount = 0;
 let sampleStart = performance.now();
@@ -287,7 +312,7 @@ function animate() {
   requestAnimationFrame(animate);
   const elapsed = clock.getElapsedTime();
   controls.update();
-  stars.rotation.y = elapsed * .006;
+  if (!reducedMotion) stars.rotation.y = elapsed * .006;
   warmLight.intensity = 20 + Math.sin(elapsed * .8) * 2.5;
   if (selectionBox && selected) selectionBox.update();
   renderer.render(scene, camera);
@@ -324,13 +349,25 @@ function finishLoading() {
   } });
 }
 
-if (!automatedBrowser) animate();
+if (innerWidth < 600) moveCamera('hero', 0);
+animate();
 finishLoading();
 
 window.__APP_READY__ = true;
 canvas.dataset.scene = 'ready';
 window.__TOWER_API__ = {
   switchMode, showStage, playCinematic, exitCinematic, moveCamera,
+  inspect: () => ({ webgl: Boolean(renderer.getContext?.()), calls: renderer.info?.render.calls,
+    triangles: renderer.info?.render.triangles, mode: currentMode, cinematic: isCinematic,
+    rotation: tower.root.rotation.y }),
+  projectExhibit: (label) => {
+    const exhibit = tower.selectables.map(mesh => mesh.userData.component).find(part => part.userData.label === label);
+    if (!exhibit) return null;
+    tower.root.updateMatrixWorld(true);
+    const center = new THREE.Box3().setFromObject(exhibit).getCenter(new THREE.Vector3()).project(camera);
+    const rect = canvas.getBoundingClientRect();
+    return { x: rect.left + (center.x + 1) * rect.width / 2, y: rect.top + (1 - center.y) * rect.height / 2 };
+  },
   selectComponent: (key) => showDetail(tower.components[key]),
 };
 

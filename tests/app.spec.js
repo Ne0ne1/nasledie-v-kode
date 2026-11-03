@@ -92,3 +92,55 @@ test('furnishings are separately pickable and move with their floor', async () =
   tower.root.updateMatrixWorld(true);
   expect(mill.getWorldPosition(new Vector3()).z - before.z).toBeCloseTo(6 * .88);
 });
+
+test('real WebGL furniture picking and cinematic reset', async ({page}) => {
+  await page.goto('/');
+  await expect(page.locator('.loader')).toBeHidden({timeout:15000});
+  await page.locator('#explore').click();
+  await page.waitForTimeout(1900);
+  await page.locator('[data-mode="xray"]').click();
+  await page.waitForTimeout(1900);
+  const stats = await page.evaluate(()=>window.__TOWER_API__.inspect());
+  expect(stats.webgl).toBeTruthy();
+  expect(stats.triangles).toBeGreaterThan(1000);
+  const point = await page.evaluate(()=>window.__TOWER_API__.projectExhibit('Ручные жернова'));
+  await page.mouse.click(point.x,point.y);
+  await expect(page.locator('.detail-title')).toHaveText('Ручные жернова');
+  await page.locator('#revive').click();
+  await page.waitForTimeout(900);
+  await page.locator('#skip').click();
+  await page.waitForTimeout(1600);
+  const state = await page.evaluate(()=>window.__TOWER_API__.inspect());
+  expect(state.mode).toBe('explore');
+  expect(state.cinematic).toBe(false);
+  expect(state.rotation).toBeCloseTo(0);
+  await expect(page.locator('[data-mode="explore"]')).toHaveClass(/active/);
+});
+
+test('reduced motion avoids the cinematic flight', async ({page}) => {
+  await page.emulateMedia({reducedMotion:'reduce'});
+  await page.goto('/');
+  await expect(page.locator('.loader')).toBeHidden({timeout:15000});
+  await page.locator('#explore').click();
+  await page.locator('#revive').click();
+  await expect(page.locator('body')).not.toHaveClass(/cinematic/);
+});
+
+test('cinematic finishes with readable title and restored controls', async ({page}) => {
+  await page.setViewportSize({width:390,height:844});
+  await page.goto('/');
+  await expect(page.locator('.loader')).toBeHidden({timeout:15000});
+  await page.locator('#explore').click();
+  await page.locator('#revive').click();
+  await expect(page.locator('#cinematic-title')).toBeVisible({timeout:10000});
+  await page.waitForTimeout(1000);
+  const overlaps = await page.locator('#cinematic-title').evaluate(el => {
+    const [a,b,c] = [...el.children].map(n=>n.getBoundingClientRect());
+    return a.bottom > b.top || b.bottom > c.top || b.right > innerWidth || b.left < 0;
+  });
+  expect(overlaps).toBe(false);
+  await page.screenshot({path:'test-results/cinematic-mobile.png'});
+  await expect(page.locator('body')).not.toHaveClass(/cinematic/,{timeout:10000});
+  await page.locator('[data-mode="explode"]').click();
+  await expect(page.locator('[data-mode="explode"]')).toHaveClass(/active/);
+});

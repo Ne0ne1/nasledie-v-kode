@@ -69,3 +69,94 @@ h1 span:nth-child(2){padding-left:3vw}
 .object-card{border-top:1px solid rgba(216,187,130,.5)}
 .brand-rune{background:rgba(216,187,130,.06)}
 @media(max-width:800px){.museum-menu{right:20px;top:70px}.info-sheet{padding-bottom:45vh}.sheet-block{gap:12px}}
+
+/* Layout audit: intrinsic text height and reserved space for each control. */
+h1{line-height:1.15}
+h1 span{white-space:nowrap}
+.overline{flex-wrap:wrap;row-gap:8px;line-height:1.6}
+.sheet-intro h2{font-size:clamp(30px,3.6vw,50px);line-height:1.18;overflow-wrap:anywhere}
+.sheet-block{grid-template-columns:110px minmax(0,1fr)}
+.sheet-block>*,.detail-card>*{min-width:0}
+.detail-title{line-height:1.25;overflow-wrap:anywhere}
+.detail-type{margin:12px 0 8px;line-height:1.5}
+.detail-card{top:90px;transform:translateX(20px);max-height:calc(100% - 230px);overflow-y:auto}
+.detail-top{align-items:center}
+.detail-close{min-width:36px;min-height:36px}
+.revive-button{top:16px;bottom:auto}
+.cinematic-title{padding:24px;gap:20px}
+.cinematic-title strong{font-family:Georgia,serif;font-size:clamp(40px,8vw,112px);line-height:1.15;letter-spacing:-.04em}
+.cinematic-title small,.cinematic-title>span{margin:0;line-height:1.8;max-width:100%}
+.mode span{min-width:0;overflow-wrap:anywhere}
+.mode-panel{max-height:calc(100% - 150px);overflow:auto}
+.stage-list button{min-height:48px}
+.stage-list span{line-height:1.5;display:block}
+.xray-panel label{gap:12px;line-height:1.6}
+.object-card dl div{gap:14px;line-height:1.6}
+.object-card dd{text-align:right}
+.info-sheet{padding-left:48px;padding-right:48px}
+.sheet-close{position:sticky;top:-76px;float:right;right:auto;z-index:2}
+.source-links a{overflow-wrap:anywhere}
+@media(max-width:1100px){
+  .hero{left:5vw;width:48vw}
+  h1{font-size:clamp(40px,6.8vw,74px)}
+  .object-card{right:24px;width:205px}
+  .mode-panel{left:20px;width:210px}
+  .detail-card,.revive-button{right:20px}
+}
+@media(max-width:800px){
+  .hero{left:24px;top:46%;width:calc(100% - 48px)}
+  h1{font-size:clamp(36px,10.8vw,70px)}
+  .hero-copy{margin-top:18px;margin-bottom:18px;line-height:1.65}
+  .overline{font-size:9px;gap:10px}
+  .mode-panel{left:12px;width:calc(100% - 24px);max-height:none;overflow:visible;gap:4px}
+  .mode{flex:1;min-width:0;padding:8px 3px;font-size:8px;line-height:1.45}
+  .mode:hover,.mode.active{padding-left:3px}
+  .mode-panel .panel-label{display:none}
+  .revive-button{right:12px;top:10px;bottom:auto;min-height:44px}
+  .detail-card{right:12px;top:66px;width:min(290px,calc(100% - 24px));max-height:calc(100% - 270px);padding:16px}
+  .detail-title{font-size:21px}
+  .detail-text{font-size:12px}
+  .build-panel,.xray-panel{bottom:100px}
+  .stage-list button{min-width:72px}
+  .info-sheet{padding:28px 24px 45vh}
+  .sheet-close{top:0;margin:0 0 22px 12px}
+  .sheet-intro{clear:both}
+  .sheet-intro h2{font-size:clamp(30px,8vw,46px)}
+  .sheet-block{grid-template-columns:1fr;gap:12px}
+  .cinematic-title strong{font-size:clamp(38px,11vw,76px)}
+}
+@media(max-height:600px) and (min-width:601px){
+  .topbar{height:54px}.scene-footer{height:38px}
+  .workspace{inset:54px 0 38px}.museum-menu{top:54px}
+  .hero{top:47%;width:52vw}.overline{margin-bottom:12px}
+  h1{font-size:clamp(32px,7vh,48px)}
+  .hero-copy{margin:12px 0;font-size:11px;max-width:330px}
+  .primary-button{margin-left:0;min-height:40px}
+  .hint,.object-card{display:none}
+  .mode-panel{left:12px;top:12px;bottom:auto;transform:none;width:190px;max-height:calc(100% - 24px);display:block;padding:10px;overflow:auto}
+  .mode{display:grid;grid-template-columns:24px 1fr;min-height:38px;text-align:left}
+  .mode i{margin:0}.mode-panel .panel-label,.view-row,.view-divider{display:none}
+  .detail-card{top:66px;max-height:calc(100% - 78px);width:260px}
+  .build-panel,.xray-panel{left:auto;right:12px;bottom:12px;transform:translateY(15px);width:calc(100% - 226px);max-width:510px}
+  .stage-list button{min-width:65px}
+  .workspace:has(.build-panel.visible) .detail-card,.workspace:has(.xray-panel.visible) .detail-card{max-height:calc(100% - 180px)}
+}
+.mode-label-short{display:none}
+@media(max-width:600px){
+  .hero{top:auto;bottom:78px;transform:none;padding:18px;background:linear-gradient(135deg,rgba(12,23,29,.94),rgba(12,23,29,.8));border:1px solid var(--line);border-radius:8px;left:16px;width:calc(100% - 32px)}
+  h1{font-size:clamp(33px,9vw,48px)}
+  .hero .overline{font-size:8px;margin-bottom:10px}
+  .hero .overline span:last-child{display:none}
+  .hero-copy{font-size:12px;margin:12px 0}
+  .primary-button{min-width:0;width:100%;font-size:10px;min-height:42px;padding:9px 0}
+  .hint{display:none}
+}
+@media(max-width:800px) and (min-height:601px){
+  .mode-label-full{display:none}.mode-label-short{display:block;font-size:10px;letter-spacing:.03em;white-space:nowrap}
+}
+@media(max-height:600px) and (min-width:601px){
+  .workspace:has(.detail-card.visible) .revive-button{visibility:hidden}
+  .detail-card{top:12px;right:12px;width:calc(100% - 226px);max-height:calc(100% - 24px);padding:12px 16px}
+  .workspace:has(.build-panel.visible) .detail-card,.workspace:has(.xray-panel.visible) .detail-card{max-height:calc(100% - 140px)}
+  .detail-top{float:right;gap:12px}.detail-type{margin:0 0 6px}.detail-title{font-size:20px;margin-bottom:8px}
+}
