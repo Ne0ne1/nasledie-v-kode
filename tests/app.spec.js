@@ -44,3 +44,22 @@ test('museum experience supports all interactive modes', async ({ page }) => {
   await page.screenshot({ path: 'test-results/nasledie-main.png', fullPage: true });
   expect(errors).toEqual([]);
 });
+
+test('information buttons open the visible panel at the requested section', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('.loader')).toBeHidden({ timeout: 12000 });
+  for (const anchor of ['about', 'controls', 'sources']) {
+    await page.locator('.menu-button').click();
+    await page.locator('[data-scroll="' + anchor + '"]').click();
+    const panel = page.locator('#info-sheet');
+    await expect(panel).toBeInViewport({ ratio: 0.9 });
+    await expect(page.locator('#' + anchor)).toBeInViewport();
+    await page.locator('#info-close').click();
+    await expect(panel).toBeHidden();
+  }
+  await page.locator('#info-open').click();
+  await expect(page.locator('#info-sheet')).toBeInViewport({ ratio: 0.9 });
+  await expect(page.locator('#about')).toBeInViewport();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#info-sheet')).toBeHidden();
+});

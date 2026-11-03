@@ -254,11 +254,24 @@ document.querySelector('#revive').addEventListener('click', playCinematic);
 document.querySelector('#skip').addEventListener('click', () => exitCinematic(true));
 
 const sheet = document.querySelector('#info-sheet');
+gsap.set(sheet, { x: 0, xPercent: 102 });
+let sheetTrigger = null;
 function openSheet(anchor) {
+  sheetTrigger = document.activeElement;
   sheet.style.visibility = 'visible';
-  gsap.to(sheet, { xPercent: 0, duration: .65, ease: 'power3.inOut', onComplete: () => { if (anchor) document.querySelector(`#${anchor}`)?.scrollIntoView({ behavior: 'smooth' }); } });
+  gsap.to(sheet, { x: 0, xPercent: 0, overwrite: true, duration: .55, ease: 'power3.out', onComplete: () => {
+    const section = document.getElementById(anchor || 'about');
+    sheet.scrollTo({ top: section ? section.offsetTop - 100 : 0, behavior: 'smooth' });
+    document.querySelector('#info-close').focus({ preventScroll: true });
+  } });
 }
-function closeSheet() { gsap.to(sheet, { xPercent: 102, duration: .55, ease: 'power3.inOut', onComplete: () => { sheet.style.visibility = 'hidden'; } }); }
+function closeSheet() {
+  if (sheet.style.visibility !== 'visible') return;
+  gsap.to(sheet, { x: 0, xPercent: 102, overwrite: true, duration: .4, ease: 'power2.inOut', onComplete: () => {
+    sheet.style.visibility = 'hidden';
+    sheetTrigger?.focus({ preventScroll: true });
+  } });
+}
 document.querySelector('#info-open').addEventListener('click', () => openSheet('about'));
 document.querySelector('#info-close').addEventListener('click', closeSheet);
 const menuButton = document.querySelector('.menu-button');

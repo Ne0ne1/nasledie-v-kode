@@ -41,3 +41,9 @@
 - Improved typography, control sizing and contrast; smoother existing tweens.
 - Build passed; Playwright modes passed (1/1); before/after WebGL PNGs inspected.
 - No Vercel project binding or Git remote found; no deployment updated.
+
+## Information panel repair — 2026-11-03
+- Removed conflicting CSS/GSAP translation; all four information buttons now open the panel in the viewport.
+- Added section scrolling, animation overwrite and focus return on close.
+- Refined menu spacing, source cards, reading-panel typography and exhibit accents.
+- Production build passed; both Playwright tests passed (18.1s), including each menu target, footer button and Escape.
