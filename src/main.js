@@ -150,7 +150,7 @@ function showDetail(component) {
   selectionBox.material.opacity = .72;
   selectionBox.userData.ignoreRaycast = true;
   scene.add(selectionBox);
-  const entries = Object.values(tower.components);
+  const entries = [...new Set(tower.selectables.map((mesh) => mesh.userData.component))];
   const index = entries.indexOf(component) + 1;
   document.querySelector('.detail-number').textContent = String(index).padStart(2, '0');
   document.querySelector('.detail-title').textContent = component.userData.label;

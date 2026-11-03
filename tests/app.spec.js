@@ -67,3 +67,28 @@ test('information buttons open the visible panel at the requested section', asyn
   await page.keyboard.press('Escape');
   await expect(page.locator('#info-sheet')).toBeHidden();
 });
+
+test('furnishings are separately pickable and move with their floor', async () => {
+  const { createTower } = await import('../src/Tower.js');
+  const { Vector3 } = await import('three');
+  const tower = createTower();
+  const exhibits = [];
+  tower.root.traverse((object) => { if (object.userData.exhibit) exhibits.push(object); });
+  expect(exhibits.map((object) => object.userData.label)).toEqual(expect.arrayContaining([
+    'Ручные жернова', 'Деревянное ведро', 'Деревянный сундук', 'Межэтажная лестница', 'Глиняный кувшин',
+  ]));
+  for (const exhibit of exhibits) {
+    exhibit.traverse((mesh) => {
+      if (mesh.isMesh) {
+        expect(tower.selectables.includes(mesh)).toBeTruthy();
+        expect(mesh.userData.component).toBe(exhibit);
+      }
+    });
+  }
+  const mill = exhibits.find((object) => object.userData.label === 'Ручные жернова');
+  tower.root.updateMatrixWorld(true);
+  const before = mill.getWorldPosition(new Vector3());
+  tower.components.floors.position.z = 6;
+  tower.root.updateMatrixWorld(true);
+  expect(mill.getWorldPosition(new Vector3()).z - before.z).toBeCloseTo(6 * .88);
+});

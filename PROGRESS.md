@@ -53,3 +53,10 @@
 - Replaced four solid floor slabs with individual boards; reused existing materials.
 - Preserved assembled positions and stage visibility; bounded animation stagger for the larger part count.
 - Build and WebGL renders verified; GLB regenerated (114 meshes); regression covers new component selection.
+
+## Furnished, selectable interiors — 2026-11-03
+- Added furniture and household objects on four decks: chests, tables, benches, vessels, sacks, bedding, ladders and floor hatches.
+- Added hand quern and wooden bucket; each exhibit has independent picking metadata and an explanatory card.
+- Furnishings remain children of the deck, preserving assembly and construction-stage behavior.
+- Interiors explicitly labeled an artistic interpretation.
+- Production build passed; renders and GLB updated (212 meshes, 12 materials).

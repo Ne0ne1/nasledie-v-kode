@@ -113,6 +113,125 @@ function createOpening(width, height, material, trimMaterial) {
   return group;
 }
 
+// Lightweight furnishings stay attached to their floor during every animation.
+function furnishLevel(deck, y, level, materials) {
+  const interior = new THREE.Group();
+  interior.name = 'Условная обстановка уровня ' + (level + 1);
+  interior.position.y = y + .11;
+  deck.add(interior);
+  const describe = (object, label, description) => {
+    object.userData.exhibit = true;
+    object.userData.label = label;
+    object.userData.description = description + ' Предмет показан в условной художественной обстановке.';
+    return object;
+  };
+  const groupRecent = (start, label, description) => {
+    const group = new THREE.Group();
+    const items = interior.children.slice(start);
+    interior.add(group);
+    items.forEach((item) => group.add(item));
+    return describe(group, label, description);
+  };
+  const box = (w, h, d, x, cy, z, material = materials.furniture) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), material);
+    mesh.position.set(x, cy, z);
+    mesh.castShadow = mesh.receiveShadow = true;
+    interior.add(mesh);
+    return mesh;
+  };
+  const vessel = (x, z, scale = 1) => {
+    const profile = [[.18,0],[.29,.08],[.36,.35],[.31,.57],[.16,.69],[.16,.79],[.20,.81]];
+    const pot = new THREE.Mesh(new THREE.LatheGeometry(profile.map(([r,h]) => new THREE.Vector2(r,h)), 14), materials.clay);
+    pot.position.set(x, 0, z); pot.scale.setScalar(scale);
+    pot.castShadow = pot.receiveShadow = true;
+    interior.add(pot);
+    describe(pot, 'Глиняный кувшин', 'Сосуд с узким горлом и округлым туловом для хранения воды и припасов. Тёмная полость подчёркивает открытое горлышко.');
+    const rim = new THREE.Mesh(new THREE.TorusGeometry(.18, .035, 6, 14), materials.clay);
+    rim.rotation.x = Math.PI / 2; rim.position.y = .80; pot.add(rim);
+    const hollow = new THREE.Mesh(new THREE.CircleGeometry(.145, 14), materials.dark);
+    hollow.rotation.x = -Math.PI / 2; hollow.position.y = .73; pot.add(hollow);
+  };
+  // Chest with lid, iron straps and latch.
+  if (level === 0 || level === 2) {
+    const chestStart = interior.children.length;
+    box(1.35,.66,.72,-.9,.33,-1.25);
+    box(1.43,.12,.79,-.9,.72,-1.25);
+    for (const x of [-1.36,-.44]) box(.07,.7,.74,x,.35,-1.25,materials.iron);
+    box(.12,.18,.05,-.9,.57,-.86,materials.iron);
+    groupRecent(chestStart, 'Деревянный сундук', 'Ящик для хранения одежды и домашних вещей. Крышка, металлические полосы и защёлка выполнены отдельными деталями.');
+    vessel(1.1, .75, 1.15); vessel(1.65,.2,.8);
+  }
+  // Low table and bench on the living and observation levels.
+  if (level === 1 || level === 3) {
+    const tableStart = interior.children.length;
+    box(1.65,.12,.85,-.55,.93,-.65);
+    for (const x of [-1.2,.1]) for (const z of [-.96,-.34]) box(.12,.87,.12,x,.435,z);
+    groupRecent(tableStart, 'Низкий деревянный стол', 'Небольшой стол на четырёх ножках организует пространство для еды и повседневных занятий.');
+    const benchStart = interior.children.length;
+    box(1.7,.14,.43,-.55,.5,.55);
+    for (const x of [-1.2,.1]) box(.13,.43,.32,x,.215,.55);
+    groupRecent(benchStart, 'Деревянная скамья', 'Простая переносная скамья с узким сиденьем и двумя опорами.');
+    const bowl = new THREE.Mesh(new THREE.SphereGeometry(.22,12,6,0,Math.PI*2,Math.PI/2,Math.PI/2),materials.clay);
+    bowl.position.set(-.55,1.2,-.65); interior.add(bowl); describe(bowl, 'Глиняная чаша', 'Небольшая открытая посуда для еды и домашних нужд.');
+    vessel(-1.6,1.15,.85);
+  }
+  if (level === 0) {
+    for (let i=0;i<2;i++) {
+      const sack = new THREE.Mesh(new THREE.SphereGeometry(1,12,8),materials.fabric);
+      sack.scale.set(.32,.46,.29); sack.position.set(-1.5+i*.65,.43,1.3);
+      describe(sack, 'Мешок с припасами', 'Тканевый мешок иллюстрирует хранение сухих продуктов на нижнем уровне.');
+      sack.castShadow = sack.receiveShadow = true; interior.add(sack);
+      box(.12,.12,.12,-1.5+i*.65,.9,1.3,materials.fabric);
+    }
+  }
+  if (level === 2) {
+    const bedStart = interior.children.length;
+    box(1.75,.06,1.05,-.6,.04,.7,materials.rug);
+    box(.55,.16,.78,-1.15,.14,.7,materials.fabric);
+    for (const z of [.22,1.18]) box(1.72,.015,.045,-.6,.08,z,materials.fabric);
+    groupRecent(bedStart, 'Спальный настил', 'Тканевая подстилка с подушкой показывает место для отдыха на деревянном перекрытии.');
+  }
+  if (level === 0) {
+    const mill = new THREE.Group();
+    mill.position.set(.35,.18,1.25); interior.add(mill);
+    for (let i=0;i<2;i++) {
+      const stone = new THREE.Mesh(new THREE.CylinderGeometry(.43,.46,.17,20),materials.trim);
+      stone.position.y=i*.18; stone.castShadow=stone.receiveShadow=true; mill.add(stone);
+    }
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.3,8),materials.furniture);
+    handle.position.set(.28,.4,0); mill.add(handle);
+    const eye = new THREE.Mesh(new THREE.CircleGeometry(.08,12),materials.dark);
+    eye.rotation.x=-Math.PI/2; eye.position.y=.27; mill.add(eye);
+    describe(mill, 'Ручные жернова', 'Два каменных диска служат для размола зерна. Верхний диск вращают за деревянную рукоять; зерно подают через центральное отверстие.');
+  }
+  if (level === 1) {
+    const bucket = new THREE.Group(); bucket.position.set(1.4,0,1.25); interior.add(bucket);
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(.3,.23,.55,12,1,true),materials.furniture);
+    body.position.y=.28; body.castShadow=true; bucket.add(body);
+    for (const y of [.12,.46]) {
+      const hoop = new THREE.Mesh(new THREE.TorusGeometry(.23+y*.12,.022,5,12),materials.iron);
+      hoop.rotation.x=Math.PI/2; hoop.position.y=y; bucket.add(hoop);
+    }
+    const bail = new THREE.Mesh(new THREE.TorusGeometry(.29,.025,5,16,Math.PI),materials.iron);
+    bail.position.y=.54; bucket.add(bail);
+    describe(bucket, 'Деревянное ведро', 'Сосуд с металлическими обручами и дугообразной ручкой для переноски воды. Открытый верх позволяет увидеть внутренний объём.');
+  }
+  if (level < 3) {
+    const ladder = new THREE.Group(); ladder.position.set(1.45,0,-1.0);
+    ladder.rotation.x = -.12; interior.add(ladder);
+    describe(ladder, 'Межэтажная лестница', 'Две деревянные стойки соединены поперечными ступенями. Лестница ведёт к люку следующего перекрытия.');
+    const height = level === 2 ? 3.55 : 3.95;
+    for (const x of [-.34,.34]) {
+      const rail = new THREE.Mesh(new THREE.BoxGeometry(.11,height,.12),materials.furniture);
+      rail.position.set(x,height/2,0); rail.castShadow=true; ladder.add(rail);
+    }
+    for (let step=0;step<10;step++) {
+      const rung = new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,.72,8),materials.furniture);
+      rung.rotation.z=Math.PI/2; rung.position.y=.25+step*(height-.45)/9; rung.castShadow=true; ladder.add(rung);
+    }
+  }
+}
+
 export function createTower() {
   const root = new THREE.Group();
   root.name = 'VainakhTower';
@@ -125,6 +244,11 @@ export function createTower() {
     dark: new THREE.MeshStandardMaterial({ color: 0x050807, roughness: 1, side: THREE.DoubleSide }),
     wood: new THREE.MeshStandardMaterial({ color: 0x3a2d20, roughness: 0.92 }),
     roof: new THREE.MeshStandardMaterial({ color: 0x747e80, roughness: 0.96 }),
+    furniture: new THREE.MeshStandardMaterial({ color: 0xa0784e, roughness: .93 }),
+    clay: new THREE.MeshStandardMaterial({ color: 0xb5714e, roughness: 1, side: THREE.DoubleSide }),
+    fabric: new THREE.MeshStandardMaterial({ color: 0xb4a486, roughness: 1 }),
+    rug: new THREE.MeshStandardMaterial({ color: 0x774d43, roughness: 1 }),
+    iron: new THREE.MeshStandardMaterial({ color: 0x353c3e, roughness: .75, metalness: .5 }),
     glow: new THREE.MeshBasicMaterial({ color: 0xd5b96f, transparent: true, opacity: 0.55 }),
   };
   shellMaterials.push(materials.core, materials.stone, materials.trim, materials.roof);
@@ -181,11 +305,12 @@ export function createTower() {
     const deck = new THREE.Group();
     deck.name = 'Настил ' + (index + 1);
     for (let plank = 0; plank < 9; plank++) {
-      const board = new THREE.Mesh(new THREE.BoxGeometry(width / 9 - .018, .22, width), materials.wood);
-      board.position.set((plank - 4) * width / 9, y, 0);
+      const board = new THREE.Mesh(new THREE.BoxGeometry(width / 9 - .018, .22, index > 0 && plank >= 6 ? width - 1.15 : width), materials.wood);
+      board.position.set((plank - 4) * width / 9, y, index > 0 && plank >= 6 ? .575 : 0);
       board.castShadow = board.receiveShadow = true;
       deck.add(board);
     }
+    furnishLevel(deck, y, index, materials);
     floors.add(deck);
     for (let beam = -2; beam <= 2; beam++) {
       const timber = new THREE.Mesh(new THREE.BoxGeometry(width + .35, .12, .13), materials.wood);
@@ -231,13 +356,13 @@ export function createTower() {
     return part;
   };
   const floorParts = [...floors.children];
-  floors.userData.label = 'Настил первого уровня';
-  floors.userData.description = 'Деревянный настил собран из отдельных досок. В разборе он отделяется от несущих балок. Внутреннее устройство показано условно.';
+  floors.userData.label = 'Нижний уровень · припасы';
+  floors.userData.description = 'Сундук, сосуды и мешки размещены на деревянном настиле. Лестница ведёт к следующему уровню. Обстановка — художественная интерпретация, не историческая реконструкция.';
   floors.userData.explode.set(0, .6, 6);
   for (let level = 0; level < 4; level++) {
     const deck = floorParts[level * 6];
-    if (level > 0) detach('deck' + level, 'Настил уровня ' + (level + 1),
-      'Отдельные доски образуют площадку уровня. Зазоры позволяют рассмотреть направление настила. Это учебная интерпретация.',
+    if (level > 0) detach('deck' + level, ['', 'Жилой уровень · стол и скамья', 'Уровень отдыха · настил и сундук', 'Верхний уровень · наблюдение'][level],
+      'Мебель, глиняная посуда и деревянный настил помогают представить масштаб внутреннего пространства. Люк оставляет место для подъёма. Обстановка показана условно.',
       3, new THREE.Vector3(0, .6 + level * .35, 6), [deck]);
     detach('beams' + level, 'Балки уровня ' + (level + 1),
       'Пять поперечных деревянных балок показаны отдельно от настила, чтобы объяснить опору площадки. Схема условная.',
@@ -267,6 +392,10 @@ export function createTower() {
     component.traverse((child) => { if (child.isMesh && !child.userData.ignoreRaycast) selectables.push(child); });
   });
 
+  // Furniture inherits its floor transform, but has an independent picking card.
+  const exhibits = [];
+  root.traverse((object) => { if (object.userData.exhibit) exhibits.push(object); });
+  exhibits.forEach((object) => assignComponent(object, object));
   root.scale.set(0.88, 1.08, 0.88);
   return { root, components, selectables, shellMaterials, materials };
 }
