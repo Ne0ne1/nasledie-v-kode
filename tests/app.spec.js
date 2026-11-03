@@ -21,6 +21,10 @@ test('museum experience supports all interactive modes', async ({ page }) => {
 
   await page.locator('[data-mode="explode"]').click();
   await expect(page.locator('[data-mode="explode"]')).toHaveClass(/active/);
+  for (const [key, label] of [['beams2', 'Балки уровня 3'], ['roofStep4', 'Ступень покрытия 5'], ['entrance', 'Входная арка']]) {
+    await page.evaluate((part) => window.__TOWER_API__.selectComponent(part), key);
+    await expect(page.locator('.detail-title')).toHaveText(label);
+  }
 
   await page.locator('[data-mode="build"]').click();
   await page.locator('[data-stage="1"]').click();

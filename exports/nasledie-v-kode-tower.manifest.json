@@ -1,12 +1,12 @@
 {
   "file": "nasledie-v-kode-tower.glb",
-  "bytes": 286812,
+  "bytes": 350512,
   "glbVersion": 2,
   "scenes": 1,
-  "nodes": 118,
-  "meshes": 82,
+  "nodes": 170,
+  "meshes": 114,
   "materials": 7,
-  "accessors": 336,
+  "accessors": 464,
   "extensionsUsed": [
     "KHR_materials_unlit",
     "EXT_mesh_gpu_instancing"

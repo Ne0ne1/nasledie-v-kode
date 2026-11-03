@@ -47,3 +47,9 @@
 - Added section scrolling, animation overwrite and focus return on close.
 - Refined menu spacing, source cards, reading-panel typography and exhibit accents.
 - Production build passed; both Playwright tests passed (18.1s), including each menu target, footer button and Escape.
+
+## Detailed exploded model — 2026-11-03
+- Expanded 7 components to 23 selectable groups: decks, beam sets, column, six roof steps, cap, corbels and entrance.
+- Replaced four solid floor slabs with individual boards; reused existing materials.
+- Preserved assembled positions and stage visibility; bounded animation stagger for the larger part count.
+- Build and WebGL renders verified; GLB regenerated (114 meshes); regression covers new component selection.

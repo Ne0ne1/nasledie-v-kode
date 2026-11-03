@@ -178,8 +178,15 @@ export function createTower() {
   const floors = makeComponent('floors', 'Внутренние перекрытия', 'Внутренние уровни показаны как условная визуализация для изучения конструкции.', 3, new THREE.Vector3(0, 0, -5));
   [4.8, 8.7, 12.6, 16.1].forEach((y, index) => {
     const width = THREE.MathUtils.lerp(5.65, 4.25, y / 19);
-    const floor = new THREE.Mesh(new THREE.BoxGeometry(width, .28, width), materials.wood);
-    floor.position.y = y; floor.rotation.y = index % 2 ? .03 : -.03; floor.castShadow = floor.receiveShadow = true; floors.add(floor);
+    const deck = new THREE.Group();
+    deck.name = 'Настил ' + (index + 1);
+    for (let plank = 0; plank < 9; plank++) {
+      const board = new THREE.Mesh(new THREE.BoxGeometry(width / 9 - .018, .22, width), materials.wood);
+      board.position.set((plank - 4) * width / 9, y, 0);
+      board.castShadow = board.receiveShadow = true;
+      deck.add(board);
+    }
+    floors.add(deck);
     for (let beam = -2; beam <= 2; beam++) {
       const timber = new THREE.Mesh(new THREE.BoxGeometry(width + .35, .12, .13), materials.wood);
       timber.position.set(0, y - .21, beam * width / 5); timber.castShadow = true; floors.add(timber);
@@ -216,6 +223,44 @@ export function createTower() {
 
   const aura = new THREE.Mesh(new THREE.CylinderGeometry(4.8, 5.7, .03, 64), materials.glow);
   aura.position.y = 1.08; aura.userData.ignoreRaycast = true; base.add(aura);
+
+  // Reuse the assembled geometry; each educational part gets its own exploded offset.
+  const detach = (key, label, description, stage, offset, objects) => {
+    const part = makeComponent(key, label, description, stage, offset);
+    objects.forEach((object) => part.add(object));
+    return part;
+  };
+  const floorParts = [...floors.children];
+  floors.userData.label = 'Настил первого уровня';
+  floors.userData.description = 'Деревянный настил собран из отдельных досок. В разборе он отделяется от несущих балок. Внутреннее устройство показано условно.';
+  floors.userData.explode.set(0, .6, 6);
+  for (let level = 0; level < 4; level++) {
+    const deck = floorParts[level * 6];
+    if (level > 0) detach('deck' + level, 'Настил уровня ' + (level + 1),
+      'Отдельные доски образуют площадку уровня. Зазоры позволяют рассмотреть направление настила. Это учебная интерпретация.',
+      3, new THREE.Vector3(0, .6 + level * .35, 6), [deck]);
+    detach('beams' + level, 'Балки уровня ' + (level + 1),
+      'Пять поперечных деревянных балок показаны отдельно от настила, чтобы объяснить опору площадки. Схема условная.',
+      3, new THREE.Vector3(0, -.45, 6), floorParts.slice(level * 6 + 1, level * 6 + 6));
+  }
+  detach('support', 'Центральная опора', 'Вертикальная деревянная опора связывает внутренние уровни цифровой модели. Она не является утверждением об устройстве конкретной исторической башни.',
+    3, new THREE.Vector3(3, 0, 5), [interiorColumn]);
+  const roofParts = [...roof.children];
+  roof.userData.label = 'Нижняя плита покрытия';
+  roof.userData.description = 'Нижняя ступень служит основанием пирамидального завершения. В разборе каждая ступень показана отдельно.';
+  for (let level = 1; level < 6; level++) {
+    detach('roofStep' + level, 'Ступень покрытия ' + (level + 1),
+      'Последовательное уменьшение каменных ступеней создаёт пирамидальный силуэт завершения.',
+      4, new THREE.Vector3(3.2 + level * .4, 2.5 + level * .55, 0), [roofParts[level]]);
+  }
+  detach('finial', 'Верхушка покрытия', 'Завершающий каменный элемент подчёркивает вертикальную ось стилизованной башни.',
+    4, new THREE.Vector3(5.6, 6, 0), [cap]);
+  detach('corbels', 'Каменные консоли', 'Выступающие камни вынесены отдельно от опоясывающей плиты. Так видны их ритм и расположение по четырём сторонам.',
+    4, new THREE.Vector3(-3.2, 3.8, 0), [corbels]);
+  crown.userData.label = 'Опоясывающая плита';
+  crown.userData.description = 'Горизонтальная плита отделяет стены от ступенчатого завершения. Консоли показаны самостоятельной группой.';
+  detach('entrance', 'Входная арка', 'Арочный вход с каменным обрамлением отделён от остальных проёмов для рассмотрения его формы.',
+    2, new THREE.Vector3(-3, 0, 7), [openings.children[0]]);
 
   Object.values(components).forEach((component) => {
     assignComponent(component, component);

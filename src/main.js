@@ -93,7 +93,7 @@ const views = {
   front: { position: [10, 15, 49], target: [0, 12, 0] },
   high: { position: [17, 24, 19], target: [0, 10, 0] },
   detail: { position: [8.5, 15.5, 11], target: [0, 14, 0] },
-  explode: { position: [25, 17, 55], target: [0, 12, 0] },
+  explode: { position: [27, 19, 59], target: [0, 14, 0] },
   hero: { position: [27, 15, 43], target: [-6, 12, 0] },
 };
 
@@ -107,7 +107,7 @@ function moveCamera(name, duration = 1.6) {
 function setComponentPositions(exploded, duration = 1.2) {
   Object.values(tower.components).forEach((component, index) => {
     const target = exploded ? component.userData.explode : component.userData.home;
-    gsap.to(component.position, { x: target.x, y: target.y, z: target.z, duration, delay: index * .045, ease: 'power3.inOut' });
+    gsap.to(component.position, { x: target.x, y: target.y, z: target.z, duration, delay: Math.min(index * .025, .3), ease: 'power3.inOut' });
   });
 }
 
@@ -217,9 +217,9 @@ function playCinematic() {
   cinematicTimeline
     .to(camera.position, { x: 23, y: 17, z: 33, duration: 1.6, ease: 'power3.inOut' }, 0)
     .to(controls.target, { x: 0, y: 10, z: 0, duration: 1.6, ease: 'power3.inOut' }, 0)
-    .to(parts.map((part) => part.position), { x: (i) => parts[i].userData.explode.x * 1.35, y: (i) => parts[i].userData.explode.y * 1.15, z: (i) => parts[i].userData.explode.z * 1.35, duration: 1.7, stagger: .07, ease: 'power3.inOut' }, .45)
+    .to(parts.map((part) => part.position), { x: (i) => parts[i].userData.explode.x * 1.35, y: (i) => parts[i].userData.explode.y * 1.15, z: (i) => parts[i].userData.explode.z * 1.35, duration: 1.7, stagger: { amount: .42 }, ease: 'power3.inOut' }, .45)
     .to(tower.root.rotation, { y: Math.PI * .72, duration: 2, ease: 'sine.inOut' }, .25)
-    .to(parts.map((part) => part.position), { x: 0, y: 0, z: 0, duration: 1.75, stagger: { each: .08, from: 'end' }, ease: 'back.inOut(1.25)' }, 2.7)
+    .to(parts.map((part) => part.position), { x: 0, y: 0, z: 0, duration: 1.75, stagger: { amount: .48, from: 'end' }, ease: 'back.inOut(1.25)' }, 2.7)
     .to(camera.position, { x: -18, y: 13, z: 24, duration: 2.4, ease: 'power2.inOut' }, 3.7)
     .to(tower.root.rotation, { y: Math.PI * 2, duration: 3.2, ease: 'sine.inOut' }, 3.5)
     .set('#cinematic-title', { visibility: 'visible' }, 5.2)
